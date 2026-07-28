@@ -1,4 +1,4 @@
-import { COLOR_PAIRS, CVD_OPTIONS, FRICTION_QS } from './data';
+import { AGE_OPTIONS, COLOR_PAIRS, CVD_OPTIONS, FRICTION_QS, PLATE_QUESTIONS } from './data';
 import type { Answers, ResultSummary } from './types';
 
 export function labelForArea(id: string | null) {
@@ -25,9 +25,14 @@ export function inferResult(answers: Answers): ResultSummary {
   const pair = COLOR_PAIRS.find((option) => option.id === answers.pair);
   const topArea = getTopFriction(answers.friction);
   const observedPatterns = [
+    answers.ageGroup ? `Age group: ${AGE_OPTIONS.find((option) => option.value === answers.ageGroup)?.label || answers.ageGroup}.` : 'Age group was skipped.',
     pair ? `Selected difficult pair: ${pair.label} (${pair.pattern}).` : 'No colour-pair pattern selected.',
     topArea ? `Highest daily friction: ${labelForArea(topArea)}.` : 'Daily friction ratings are incomplete.',
   ];
+  const missedPlates = PLATE_QUESTIONS.filter((plate) => ['no', 'maybe'].includes(answers.plateResponses[plate.id]));
+  if (missedPlates.length) {
+    observedPatterns.push(`Colour picture activity: ${missedPlates.length} of ${PLATE_QUESTIONS.length} cards were marked “maybe” or “no”.`);
+  }
   const selfReportMatchesPair =
     (answers.cvd === 'rg_d' || answers.cvd === 'rg_p') && ['rg', 'rb', 'og', 'bp'].includes(answers.pair || '');
   const tritanMatchesPair = answers.cvd === 'by' && ['by', 'bp'].includes(answers.pair || '');
@@ -78,11 +83,13 @@ export function buildPersonalSummary(answers: Answers, result: ResultSummary) {
 }
 
 export function validateStep(step: number, answers: Answers) {
-  if (step === 1 && !answers.cvd) return 'Choose the option that best describes your current understanding.';
-  if (step === 2 && !FRICTION_QS.every((q) => answers.friction[q.id])) return 'Rate every daily-life situation before continuing.';
-  if (step === 3 && !answers.worst) return 'Choose the situation that causes the most stress.';
-  if (step === 3 && answers.worst === 'other' && answers.worstOther.trim().length < 3) return 'Briefly describe the other situation.';
-  if (step === 4 && !answers.pair) return 'Choose a colour pair, or choose “None of these”.';
+  if (step === 1 && !answers.ageGroup) return 'Choose an age group, or choose “Prefer not to say”.';
+  if (step === 2 && !answers.cvd) return 'Choose the option that best describes your current understanding.';
+  if (step === 3 && !PLATE_QUESTIONS.every((plate) => answers.plateResponses[plate.id])) return 'Answer each colour picture question before continuing.';
+  if (step === 4 && !FRICTION_QS.every((q) => answers.friction[q.id])) return 'Rate every daily-life situation before continuing.';
+  if (step === 5 && !answers.worst) return 'Choose the situation that causes the most stress.';
+  if (step === 5 && answers.worst === 'other' && answers.worstOther.trim().length < 3) return 'Briefly describe the other situation.';
+  if (step === 6 && !answers.pair) return 'Choose a colour pair, or choose “None of these”.';
   return '';
 }
 

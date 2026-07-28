@@ -4,7 +4,9 @@ export const DISCLAIMER =
   'Chromiview is a gentle, screen-based colour activity. It cannot diagnose a colour-vision deficiency. Results may be affected by the device, display settings, brightness, lighting, and colour filters. A qualified eye-care professional is needed for a clinical assessment.';
 
 export const EMPTY_ANSWERS = {
+  ageGroup: '',
   cvd: null,
+  plateResponses: {},
   friction: {},
   worst: null,
   worstOther: '',
@@ -13,6 +15,14 @@ export const EMPTY_ANSWERS = {
   wishlist: '',
   researchConsent: false,
 };
+
+export const AGE_OPTIONS = [
+  { value: 'preschool', label: '3-5', sub: 'Preschool or early years' },
+  { value: 'child', label: '6-10', sub: 'Primary school' },
+  { value: 'teen', label: '11-17', sub: 'Older student' },
+  { value: 'adult', label: '18+', sub: 'Grown-up helper or adult user' },
+  { value: 'skip', label: 'Prefer not to say', sub: 'Skip this question' },
+];
 
 export const CVD_OPTIONS: { value: CvdValue; label: string; sub: string }[] = [
   { value: 'none', label: 'No - I have typical colour vision', sub: "I'm completing this as a helper, teacher, parent, designer, or researcher." },
@@ -49,6 +59,39 @@ export const COLOR_PAIRS = [
   { id: 'bp', label: 'Blue vs purple', c1: '#1297F4', c2: '#7048E8', pattern: 'blue-purple confusion' },
   { id: 'og', label: 'Orange vs brown', c1: '#E67E22', c2: '#795548', pattern: 'orange-brown confusion' },
   { id: 'none', label: 'None of these', c1: '#A7B0C4', c2: '#E8ECF5', pattern: 'no selected colour-pair confusion' },
+];
+
+export const PLATE_QUESTIONS = [
+  {
+    id: 'plate_star',
+    title: 'Colour picture 1',
+    prompt: 'Can you see the star in the dots?',
+    answer: 'star',
+    fg: '#C43C32',
+    bg: '#2CA85D',
+  },
+  {
+    id: 'plate_circle',
+    title: 'Colour picture 2',
+    prompt: 'Can you see the circle in the dots?',
+    answer: 'circle',
+    fg: '#1C83D4',
+    bg: '#7048E8',
+  },
+  {
+    id: 'plate_number',
+    title: 'Colour picture 3',
+    prompt: 'Can you see the number 5 in the dots?',
+    answer: 'number 5',
+    fg: '#E9B949',
+    bg: '#795548',
+  },
+];
+
+export const PLATE_RESPONSE_OPTIONS = [
+  { value: 'yes', label: 'Yes, I can see it' },
+  { value: 'maybe', label: 'Maybe / a little bit' },
+  { value: 'no', label: "No, I can't see it" },
 ];
 
 export const TOOL_OPTIONS = [

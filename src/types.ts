@@ -4,7 +4,9 @@ export type TextScale = 'normal' | 'large' | 'xlarge';
 export type AppView = 'home' | 'prepare' | 'screening' | 'results' | 'tools' | 'learn' | 'privacy';
 
 export type Answers = {
+  ageGroup: string;
   cvd: CvdValue | null;
+  plateResponses: Record<string, string>;
   friction: Record<string, number>;
   worst: string | null;
   worstOther: string;

@@ -208,6 +208,52 @@ fieldset { border: 0; margin: 0; padding: 0; }
   grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 1fr));
   gap: 1rem;
 }
+.plate-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.plate-card {
+  border: 1.5px solid var(--border);
+  border-radius: .9rem;
+  background: var(--surface);
+  padding: 1rem;
+}
+.dot-plate {
+  width: min(100%, 220px);
+  aspect-ratio: 1;
+  display: block;
+  margin: 0 auto .75rem;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  background: #fff;
+}
+.plate-symbol {
+  font-size: 48px;
+  font-weight: 900;
+  paint-order: stroke;
+  stroke: rgba(255, 255, 255, .45);
+  stroke-width: 2px;
+}
+.plate-options {
+  display: grid;
+  gap: .5rem;
+  margin-top: .75rem;
+}
+.plate-options label {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: .55rem;
+  align-items: center;
+  border: 1.5px solid var(--border);
+  border-radius: .7rem;
+  padding: .65rem;
+}
+.plate-options label:has(input:checked) {
+  border-color: var(--text);
+  box-shadow: inset 0 0 0 2px var(--brand);
+}
 .pair-card { text-align: left; background: var(--surface); color: var(--text); border: 1.5px solid var(--border); border-radius: .9rem; padding: .8rem; }
 .pair-swatch { display: block; height: 64px; border: 1.5px solid var(--border); border-radius: .65rem; margin-bottom: .55rem; }
 

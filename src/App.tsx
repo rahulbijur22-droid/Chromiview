@@ -5,7 +5,10 @@ import {
   DISCLAIMER,
   EMPTY_ANSWERS,
   FRICTION_QS,
+  AGE_OPTIONS,
   LEARN_TOPICS,
+  PLATE_QUESTIONS,
+  PLATE_RESPONSE_OPTIONS,
   PREPARATION_ITEMS,
   TOOL_OPTIONS,
   WORST_OPTIONS,
@@ -22,7 +25,7 @@ import {
 import { clearLocalData, loadAnswers, loadHistory, loadSettings, saveAnswers, saveHistory, saveSettings } from './storage';
 import type { Answers, AppView, TextScale, ThemeMode } from './types';
 
-const TOTAL_STEPS = 6;
+const TOTAL_STEPS = 8;
 
 function Logo() {
   return <img className="brand-logo" src="/chromiview-logo.png" width="48" height="48" alt="Chromiview logo" decoding="async" />;
@@ -132,13 +135,35 @@ function ScreeningProgress({ step }: { step: number }) {
   );
 }
 
+function DotPlate({ plate }: { plate: (typeof PLATE_QUESTIONS)[number] }) {
+  const dots = Array.from({ length: 56 }, (_, index) => {
+    const angle = index * 2.399963;
+    const radius = 10 + ((index * 17) % 42);
+    const x = 50 + Math.cos(angle) * radius;
+    const y = 50 + Math.sin(angle) * radius;
+    const size = 4 + (index % 4);
+    const fill = index % 3 === 0 ? plate.fg : index % 2 === 0 ? plate.bg : '#f4f7fb';
+    return <circle key={index} cx={x} cy={y} r={size} fill={fill} opacity="0.92" />;
+  });
+
+  return (
+    <svg className="dot-plate" viewBox="0 0 100 100" role="img" aria-label={`${plate.title}: ${plate.prompt}`}>
+      <circle cx="50" cy="50" r="48" fill="#fff" />
+      {dots}
+      {plate.answer === 'star' && <text x="50" y="61" textAnchor="middle" className="plate-symbol" fill={plate.fg}>★</text>}
+      {plate.answer === 'circle' && <circle cx="50" cy="50" r="22" fill="none" stroke={plate.fg} strokeWidth="9" />}
+      {plate.answer === 'number 5' && <text x="50" y="65" textAnchor="middle" className="plate-symbol" fill={plate.fg}>5</text>}
+    </svg>
+  );
+}
+
 function Home({ setView, hasSaved }: { setView: (view: AppView) => void; hasSaved: boolean }) {
   return (
     <section className="hero-card view-panel">
       <p className="eyebrow">Kid-friendly colour activity</p>
       <h1>Explore how colours feel in everyday life.</h1>
       <p className="lead">
-        Chromiview combines simple questions, labelled colour pairs, practical tips, and a printable report. It is friendly for classroom demos when a grown-up reads along.
+        Chromiview combines an age question, simple colour-picture activities, labelled colour pairs, practical tips, and a printable report. It is friendly for classroom demos when a grown-up reads along.
       </p>
       <p className="disclaimer">{DISCLAIMER}</p>
       <div className="actions">
@@ -230,8 +255,26 @@ function ScreeningFlow({
 
       {step === 1 && (
         <fieldset>
+          <legend ref={headingRef} tabIndex={-1}>How old are you?</legend>
+          <p className="muted">A grown-up can help choose. This only helps Chromiview use friendlier wording.</p>
+          <div className="choice-stack">
+            {AGE_OPTIONS.map((option) => (
+              <label className="choice-card" key={option.value}>
+                <input type="radio" name="ageGroup" checked={answers.ageGroup === option.value} onChange={() => update({ ageGroup: option.value })} />
+                <span>
+                  <strong>{option.label}</strong>
+                  <small>{option.sub}</small>
+                </span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      )}
+
+      {step === 2 && (
+        <fieldset>
           <legend ref={headingRef} tabIndex={-1}>What do you already know about your colour vision?</legend>
-          <p className="muted">Choose the option that best matches your current understanding.</p>
+          <p className="muted">Choose the option that best matches your current understanding. A grown-up can answer this for younger children.</p>
           <div className="choice-stack">
             {CVD_OPTIONS.map((option) => (
               <label className="choice-card" key={option.value}>
@@ -246,7 +289,36 @@ function ScreeningFlow({
         </fieldset>
       )}
 
-      {step === 2 && (
+      {step === 3 && (
+        <fieldset>
+          <legend ref={headingRef} tabIndex={-1}>Colour picture activity</legend>
+          <p className="muted">These dot pictures are inspired by traditional colour-vision plates, but they are not clinical tests. Ask: “Can you see it?”</p>
+          <div className="plate-grid">
+            {PLATE_QUESTIONS.map((plate) => (
+              <article className="plate-card" key={plate.id}>
+                <DotPlate plate={plate} />
+                <h2>{plate.title}</h2>
+                <p>{plate.prompt}</p>
+                <div className="plate-options" role="radiogroup" aria-label={plate.prompt}>
+                  {PLATE_RESPONSE_OPTIONS.map((option) => (
+                    <label key={option.value}>
+                      <input
+                        type="radio"
+                        name={plate.id}
+                        checked={answers.plateResponses[plate.id] === option.value}
+                        onChange={() => update({ plateResponses: { ...answers.plateResponses, [plate.id]: option.value } })}
+                      />
+                      <span>{option.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </article>
+            ))}
+          </div>
+        </fieldset>
+      )}
+
+      {step === 4 && (
         <fieldset>
           <legend ref={headingRef} tabIndex={-1}>How much friction do colours create in daily life?</legend>
           <p className="muted">Rate each situation from 1 for no friction to 5 for significant friction.</p>
@@ -277,7 +349,7 @@ function ScreeningFlow({
         </fieldset>
       )}
 
-      {step === 3 && (
+      {step === 5 && (
         <fieldset>
           <legend ref={headingRef} tabIndex={-1}>Which situation causes the most stress?</legend>
           <div className="choice-stack">
@@ -298,7 +370,7 @@ function ScreeningFlow({
         </fieldset>
       )}
 
-      {step === 4 && (
+      {step === 6 && (
         <fieldset>
           <legend ref={headingRef} tabIndex={-1}>Which colour pair is hardest for you?</legend>
           <p className="muted">Every swatch includes text labels because colour alone is never enough.</p>
@@ -314,7 +386,7 @@ function ScreeningFlow({
         </fieldset>
       )}
 
-      {step === 5 && (
+      {step === 7 && (
         <fieldset>
           <legend ref={headingRef} tabIndex={-1}>What support do you use today?</legend>
           <div className="choice-stack">
@@ -332,7 +404,7 @@ function ScreeningFlow({
         </fieldset>
       )}
 
-      {step === 6 && (
+      {step === 8 && (
         <fieldset>
           <legend ref={headingRef} tabIndex={-1}>Finish and see your report</legend>
           <p className="muted">Everyone can see their report. This is a colour activity, not a school test and not a doctor visit.</p>
@@ -372,6 +444,7 @@ function ResultsReport({ answers, restart, deleteData }: { answers: Answers; res
 
   const report = {
     generatedAt: new Date().toISOString(),
+    ageGroup: answers.ageGroup,
     reportedPattern: result.reportedPattern,
     responseConsistency: result.responseConsistency,
     observedPatterns: result.observedPatterns,
@@ -514,7 +587,7 @@ export default function App() {
   const [answers, setAnswers] = useState<Answers>(() => loadAnswers());
   const [settings, setSettings] = useState(() => loadSettings());
   const [view, setView] = useState<AppView>(() => (loadAnswers().cvd ? 'home' : 'home'));
-  const hasSaved = Boolean(answers.cvd || Object.keys(answers.friction).length || answers.worst || answers.pair);
+  const hasSaved = Boolean(answers.ageGroup || answers.cvd || Object.keys(answers.friction).length || answers.worst || answers.pair);
 
   useEffect(() => {
     document.title = view === 'results' ? 'Your Chromiview Report' : 'Chromiview | Colour Vision Screening';
