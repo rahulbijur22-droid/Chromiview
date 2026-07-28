@@ -1,7 +1,7 @@
 import type { CvdValue } from './types';
 
 export const DISCLAIMER =
-  'Chromiview provides an informal, screen-based indication and cannot diagnose a colour-vision deficiency. Results may be affected by your device, display calibration, brightness, ambient lighting, and software colour filters. Consult a qualified eye-care professional for a clinical assessment.';
+  'Chromiview is a gentle, screen-based colour activity. It cannot diagnose a colour-vision deficiency. Results may be affected by the device, display settings, brightness, lighting, and colour filters. A qualified eye-care professional is needed for a clinical assessment.';
 
 export const EMPTY_ANSWERS = {
   cvd: null,
@@ -12,12 +12,10 @@ export const EMPTY_ANSWERS = {
   tools: [],
   wishlist: '',
   researchConsent: false,
-  emailConsent: false,
-  email: '',
 };
 
 export const CVD_OPTIONS: { value: CvdValue; label: string; sub: string }[] = [
-  { value: 'none', label: 'No - I have typical colour vision', sub: "I'm completing this as an ally, designer, student, or researcher." },
+  { value: 'none', label: 'No - I have typical colour vision', sub: "I'm completing this as a helper, teacher, parent, designer, or researcher." },
   { value: 'rg_d', label: 'Red-green CVD - deutan family', sub: 'Greens, reds, oranges, browns, blues, and purples may be harder to separate.' },
   { value: 'rg_p', label: 'Red-green CVD - protan family', sub: 'Reds may appear darker, muted, or easier to miss.' },
   { value: 'by', label: 'Blue-yellow CVD - tritan family', sub: 'Blue, green, yellow, and violet distinctions may be difficult.' },
@@ -26,21 +24,21 @@ export const CVD_OPTIONS: { value: CvdValue; label: string; sub: string }[] = [
 ];
 
 export const FRICTION_QS = [
-  { id: 'cooking', label: 'Cooking - judging ripeness, doneness, or freshness' },
-  { id: 'dressing', label: 'Dressing - matching or choosing clothing colours' },
-  { id: 'navigation', label: 'Navigation - maps, transit lines, or road signs' },
-  { id: 'work', label: 'Work or school - charts, slides, spreadsheets, diagrams' },
-  { id: 'healthcare', label: 'Healthcare - medication labels, test strips, charts' },
-  { id: 'social', label: 'Social situations - colour jokes, questions, or mistakes' },
+  { id: 'cooking', label: 'Food - telling if fruit or snacks look ready' },
+  { id: 'dressing', label: 'Clothes - matching colours when getting dressed' },
+  { id: 'navigation', label: 'Finding the way - maps, signs, or coloured lines' },
+  { id: 'work', label: 'Classroom - charts, drawings, slides, or worksheets' },
+  { id: 'healthcare', label: 'Health labels - medicine labels or colour-coded charts with a grown-up' },
+  { id: 'social', label: 'Friends - being asked about colours or feeling unsure' },
 ];
 
 export const WORST_OPTIONS = [
-  { value: 'cooking', label: 'Cooking - food safety, ripeness, or freshness' },
-  { value: 'dressing', label: 'Dressing - matching or choosing colours' },
-  { value: 'navigation', label: 'Navigation - maps, routes, transit, signs' },
-  { value: 'work', label: 'Work or school - charts, presentations, documents' },
-  { value: 'healthcare', label: 'Healthcare - labels, strips, test results' },
-  { value: 'social', label: "Social situations - being asked 'what colour is that?'" },
+  { value: 'cooking', label: 'Food - fruit, snacks, or cooking with a grown-up' },
+  { value: 'dressing', label: 'Clothes - matching or choosing colours' },
+  { value: 'navigation', label: 'Finding the way - maps, routes, signs' },
+  { value: 'work', label: 'Classroom - charts, drawings, slides, worksheets' },
+  { value: 'healthcare', label: 'Health labels - only with a grown-up helper' },
+  { value: 'social', label: "Friends - being asked 'what colour is that?'" },
   { value: 'other', label: 'Something else' },
 ];
 
@@ -58,7 +56,7 @@ export const TOOL_OPTIONS = [
   { value: 'glasses', label: 'Colour-correcting glasses' },
   { value: 'phone', label: 'Phone camera or accessibility mode' },
   { value: 'colornaming', label: 'A colour-naming app' },
-  { value: 'askothers', label: 'Asking friends, family, or colleagues' },
+  { value: 'askothers', label: 'Asking a teacher, grown-up, friend, or family member' },
   { value: 'osfeatures', label: 'OS accessibility features or high contrast' },
 ];
 
@@ -68,6 +66,7 @@ export const PREPARATION_ITEMS = [
   'Disable OS colour filters before answering.',
   'Use comfortable brightness.',
   'Avoid strong screen glare.',
+  'For preschool demos, have a grown-up read the questions and remind children that this is not a test they can fail.',
 ];
 
 export const LEARN_TOPICS = [

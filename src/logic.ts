@@ -77,17 +77,12 @@ export function buildPersonalSummary(answers: Answers, result: ResultSummary) {
   return `${result.reportedPattern} is your reported pattern, and your responses point most strongly to ${area.toLowerCase()} as the area to improve first. ${toolText} Start with one repeatable adaptation and test whether it reduces mistakes or stress over a week.`;
 }
 
-export function isEmailValid(value: string) {
-  return value.trim() === '' || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
-}
-
 export function validateStep(step: number, answers: Answers) {
   if (step === 1 && !answers.cvd) return 'Choose the option that best describes your current understanding.';
   if (step === 2 && !FRICTION_QS.every((q) => answers.friction[q.id])) return 'Rate every daily-life situation before continuing.';
   if (step === 3 && !answers.worst) return 'Choose the situation that causes the most stress.';
   if (step === 3 && answers.worst === 'other' && answers.worstOther.trim().length < 3) return 'Briefly describe the other situation.';
   if (step === 4 && !answers.pair) return 'Choose a colour pair, or choose “None of these”.';
-  if (step === 6 && answers.emailConsent && !isEmailValid(answers.email)) return 'Enter a valid email address or turn off email updates.';
   return '';
 }
 

@@ -135,10 +135,10 @@ function ScreeningProgress({ step }: { step: number }) {
 function Home({ setView, hasSaved }: { setView: (view: AppView) => void; hasSaved: boolean }) {
   return (
     <section className="hero-card view-panel">
-      <p className="eyebrow">Informal screen-based indication</p>
-      <h1>Understand your colour-vision experience and what to do next.</h1>
+      <p className="eyebrow">Kid-friendly colour activity</p>
+      <h1>Explore how colours feel in everyday life.</h1>
       <p className="lead">
-        Chromiview combines a six-step questionnaire, difficult-colour-pair selection, practical adaptations, and accessible reporting.
+        Chromiview combines simple questions, labelled colour pairs, practical tips, and a printable report. It is friendly for classroom demos when a grown-up reads along.
       </p>
       <p className="disclaimer">{DISCLAIMER}</p>
       <div className="actions">
@@ -334,22 +334,16 @@ function ScreeningFlow({
 
       {step === 6 && (
         <fieldset>
-          <legend ref={headingRef} tabIndex={-1}>Optional citizen-science participation</legend>
-          <p className="muted">You can receive your result without research consent. There is no secure backend connected, so responses are not currently uploaded.</p>
+          <legend ref={headingRef} tabIndex={-1}>Finish and see your report</legend>
+          <p className="muted">Everyone can see their report. This is a colour activity, not a school test and not a doctor visit.</p>
+          <p className="storage-note">Results stay on this device right now. They are not uploaded anywhere unless you connect a secure storage option later.</p>
           <label className="choice-card">
             <input type="checkbox" checked={answers.researchConsent} onChange={(event) => update({ researchConsent: event.target.checked })} />
-            <span><strong>I want my anonymous responses included if a secure research backend is connected later.</strong></span>
+            <span>
+              <strong>A parent, teacher, or grown-up helper says this anonymous answer may be saved for the project later.</strong>
+              <small>This is optional. Leaving it unchecked still shows the report.</small>
+            </span>
           </label>
-          <label className="choice-card">
-            <input type="checkbox" checked={answers.emailConsent} onChange={(event) => update({ emailConsent: event.target.checked })} />
-            <span><strong>I want optional email updates.</strong><small>Email consent is separate from research-data consent.</small></span>
-          </label>
-          {answers.emailConsent && (
-            <label className="field">
-              Email address
-              <input type="email" value={answers.email} onChange={(event) => update({ email: event.target.value })} />
-            </label>
-          )}
         </fieldset>
       )}
 
@@ -504,8 +498,10 @@ function PrivacyNotice({ deleteData }: { deleteData: () => void }) {
   return (
     <section className="card view-panel">
       <h1>Privacy and local data</h1>
-      <p>Chromiview currently runs locally in your browser. It does not upload questionnaire answers, inferred patterns, or email addresses because no secure backend is connected.</p>
+      <p>Chromiview currently runs locally in your browser. It does not upload questionnaire answers, inferred patterns, names, or contact details because no secure backend is connected.</p>
       <p>Autosave stores your current answers in localStorage so you can resume after refresh. Result history is stored only if you explicitly press “Save result history locally”.</p>
+      <p>For preschool or classroom demos, avoid collecting names, contact details, faces, or health identifiers. If you need class results, collect only anonymous totals or use parent/teacher-approved consent.</p>
+      <p>Storage recommendation: Google Sheets is fine for a small demo or teacher-run pilot, but a real public launch should use Supabase or Netlify Forms with access controls, consent records, and no analytics events containing health answers.</p>
       <p>Saved local reports: {history.length}</p>
       <div className="actions">
         <button className="button danger" type="button" onClick={deleteData}>Delete my local data</button>

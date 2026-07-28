@@ -12,8 +12,6 @@ export type Answers = {
   tools: string[];
   wishlist: string;
   researchConsent: boolean;
-  emailConsent: boolean;
-  email: string;
 };
 
 export type ResultSummary = {
