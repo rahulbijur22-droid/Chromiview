@@ -28,6 +28,11 @@ import { clearLocalData, loadAnswers, loadHistory, loadSettings, saveAnswers, sa
 import type { Answers, AppView, TextScale, ThemeMode } from './types';
 
 const TOTAL_STEPS = 8;
+const BANNER_BY_THEME: Record<ThemeMode, string> = {
+  light: '/banners/chromiview-banner-light.png',
+  dark: '/banners/chromiview-banner-dark.png',
+  contrast: '/banners/chromiview-banner-contrast.png',
+};
 
 function Logo() {
   return <img className="brand-logo" src="/chromiview-logo.png" width="48" height="48" alt="Chromiview logo" decoding="async" />;
@@ -278,7 +283,7 @@ function DotPlate({ plate, seed }: { plate: PlateLike; seed?: number }) {
   );
 }
 
-function Home({ setView, hasSaved }: { setView: (view: AppView) => void; hasSaved: boolean }) {
+function Home({ setView, hasSaved, theme }: { setView: (view: AppView) => void; hasSaved: boolean; theme: ThemeMode }) {
   const openAlphaPlates = () => {
     const shouldContinue = window.confirm(
       'Alpha testing warning: this Ishihara-style activity is experimental, screen-based, and not a clinical colour-vision diagnosis. Continue?'
@@ -288,6 +293,14 @@ function Home({ setView, hasSaved }: { setView: (view: AppView) => void; hasSave
 
   return (
     <section className="hero-card view-panel">
+      <img
+        className="hero-banner"
+        src={BANNER_BY_THEME[theme]}
+        width="2508"
+        height="627"
+        alt="Chromiview: Seeing the world in full color. AI-powered colorblindness assessment."
+        decoding="async"
+      />
       <p className="eyebrow">Kid-friendly colour activity</p>
       <h1>Explore how colours feel in everyday life.</h1>
       <p className="lead">
@@ -984,7 +997,7 @@ export default function App() {
 
   return (
     <AppShell view={view} setView={setView} settings={settings} setSettings={setSettings}>
-      {view === 'home' && <Home setView={setView} hasSaved={hasSaved} />}
+      {view === 'home' && <Home setView={setView} hasSaved={hasSaved} theme={settings.theme} />}
       {view === 'prepare' && <PreparationStep onStart={() => setView('screening')} />}
       {view === 'screening' && <ScreeningFlow answers={answers} setAnswers={setAnswers} setView={setView} restart={restart} />}
       {view === 'results' && <ResultsReport answers={answers} restart={restart} deleteData={deleteData} />}
