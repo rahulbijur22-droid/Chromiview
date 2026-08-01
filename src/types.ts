@@ -1,7 +1,7 @@
 export type CvdValue = 'none' | 'rg_d' | 'rg_p' | 'by' | 'total' | 'unsure';
 export type ThemeMode = 'light' | 'dark' | 'contrast';
 export type TextScale = 'normal' | 'large' | 'xlarge';
-export type AppView = 'home' | 'prepare' | 'screening' | 'results' | 'tools' | 'learn' | 'privacy';
+export type AppView = 'home' | 'prepare' | 'screening' | 'results' | 'plates' | 'tools' | 'learn' | 'privacy';
 
 export type Answers = {
   ageGroup: string;

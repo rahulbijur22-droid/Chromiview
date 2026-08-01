@@ -7,6 +7,8 @@ import {
   FRICTION_QS,
   AGE_OPTIONS,
   LEARN_TOPICS,
+  PLATE_ONLY_QUESTIONS,
+  PLATE_ONLY_RESPONSE_OPTIONS,
   PLATE_QUESTIONS,
   PLATE_RESPONSE_OPTIONS,
   PREPARATION_ITEMS,
@@ -135,24 +137,95 @@ function ScreeningProgress({ step }: { step: number }) {
   );
 }
 
-function DotPlate({ plate }: { plate: (typeof PLATE_QUESTIONS)[number] }) {
-  const dots = Array.from({ length: 56 }, (_, index) => {
-    const angle = index * 2.399963;
-    const radius = 10 + ((index * 17) % 42);
-    const x = 50 + Math.cos(angle) * radius;
-    const y = 50 + Math.sin(angle) * radius;
-    const size = 4 + (index % 4);
-    const fill = index % 3 === 0 ? plate.fg : index % 2 === 0 ? plate.bg : '#f4f7fb';
-    return <circle key={index} cx={x} cy={y} r={size} fill={fill} opacity="0.92" />;
-  });
+function seededRandom(seed: number) {
+  let value = seed % 2147483647;
+  if (value <= 0) value += 2147483646;
+  return () => {
+    value = (value * 16807) % 2147483647;
+    return (value - 1) / 2147483646;
+  };
+}
+
+function hashText(text: string) {
+  return text.split('').reduce((hash, char) => (hash * 31 + char.charCodeAt(0)) >>> 0, 2166136261);
+}
+
+function colourVariant(hex: string, random: () => number) {
+  const clean = hex.replace('#', '');
+  const channels = [0, 2, 4].map((start) => parseInt(clean.slice(start, start + 2), 16));
+  const shift = Math.round((random() - 0.5) * 42);
+  return `rgb(${channels.map((channel) => Math.max(0, Math.min(255, channel + shift))).join(', ')})`;
+}
+
+function isInsidePlateSymbol(kind: string, x: number, y: number) {
+  const dx = x - 50;
+  const dy = y - 50;
+  if (kind === 'star') {
+    const angle = Math.atan2(dy, dx);
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    const pointRadius = 18 + 12 * Math.pow(Math.max(0, Math.cos(5 * angle)), 2);
+    return distance < pointRadius && distance > 5;
+  }
+  if (kind === 'ring') {
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    return distance > 18 && distance < 30;
+  }
+  if (kind === 'triangle') {
+    return y > 28 && y < 72 && x > 50 - (y - 22) * 0.72 && x < 50 + (y - 22) * 0.72;
+  }
+  if (kind === 'five') {
+    return (
+      (x >= 34 && x <= 68 && y >= 25 && y <= 34) ||
+      (x >= 32 && x <= 43 && y >= 30 && y <= 52) ||
+      (x >= 34 && x <= 64 && y >= 47 && y <= 56) ||
+      (x >= 57 && x <= 69 && y >= 51 && y <= 72) ||
+      (x >= 34 && x <= 65 && y >= 67 && y <= 76)
+    );
+  }
+  return false;
+}
+
+type PlateLike = {
+  id: string;
+  title: string;
+  prompt: string;
+  answer: string;
+  kind: string;
+  fg: string;
+  bg: string;
+};
+
+function DotPlate({ plate, seed }: { plate: PlateLike; seed?: number }) {
+  const dots = useMemo(() => {
+    const random = seededRandom((seed || Date.now()) + hashText(plate.id));
+    const generated = [];
+    for (let row = 5; row <= 95; row += 4.3) {
+      for (let col = 5; col <= 95; col += 4.3) {
+        const x = col + (random() - 0.5) * 3.8;
+        const y = row + (random() - 0.5) * 3.8;
+        const dx = x - 50;
+        const dy = y - 50;
+        if (Math.sqrt(dx * dx + dy * dy) > 47) continue;
+        const inSymbol = isInsidePlateSymbol(plate.kind, x, y);
+        const base = inSymbol ? plate.fg : plate.bg;
+        generated.push({
+          x,
+          y,
+          r: 1.95 + random() * 2.15,
+          fill: colourVariant(base, random),
+          opacity: 0.84 + random() * 0.16,
+        });
+      }
+    }
+    return generated;
+  }, [plate, seed]);
 
   return (
     <svg className="dot-plate" viewBox="0 0 100 100" role="img" aria-label={`${plate.title}: ${plate.prompt}`}>
       <circle cx="50" cy="50" r="48" fill="#fff" />
-      {dots}
-      {plate.answer === 'star' && <text x="50" y="61" textAnchor="middle" className="plate-symbol" fill={plate.fg}>★</text>}
-      {plate.answer === 'circle' && <circle cx="50" cy="50" r="22" fill="none" stroke={plate.fg} strokeWidth="9" />}
-      {plate.answer === 'number 5' && <text x="50" y="65" textAnchor="middle" className="plate-symbol" fill={plate.fg}>5</text>}
+      {dots.map((dot, index) => (
+        <circle key={index} cx={dot.x} cy={dot.y} r={dot.r} fill={dot.fill} opacity={dot.opacity} />
+      ))}
     </svg>
   );
 }
@@ -170,8 +243,89 @@ function Home({ setView, hasSaved }: { setView: (view: AppView) => void; hasSave
         <button className="button primary" type="button" onClick={() => setView(hasSaved ? 'screening' : 'prepare')}>
           {hasSaved ? 'Resume screening' : 'Start screening'}
         </button>
+        <button className="button secondary alpha-button" type="button" onClick={() => setView('plates')}>
+          Ishihara-style test only
+          <span className="alpha-tag">α Alpha</span>
+        </button>
         <button className="button secondary" type="button" onClick={() => setView('tools')}>
           Open accessibility tools
+        </button>
+      </div>
+    </section>
+  );
+}
+
+function PlatesOnlyTest({ setView }: { setView: (view: AppView) => void }) {
+  const [seed, setSeed] = useState(() => Date.now());
+  const [index, setIndex] = useState(0);
+  const [responses, setResponses] = useState<Record<string, string>>({});
+  const plates = useMemo(() => {
+    const random = seededRandom(seed);
+    return [...PLATE_ONLY_QUESTIONS]
+      .map((plate) => ({ plate, sort: random() }))
+      .sort((a, b) => a.sort - b.sort)
+      .map((item) => item.plate);
+  }, [seed]);
+  const current = plates[index];
+  const isDone = index >= plates.length;
+  const correct = plates.filter((plate) => responses[plate.id] === plate.answer).length;
+
+  const restart = () => {
+    setSeed(Date.now());
+    setIndex(0);
+    setResponses({});
+  };
+
+  if (isDone) {
+    return (
+      <section className="card view-panel plates-only">
+        <p className="eyebrow">α Alpha Ishihara-style activity</p>
+        <h1>Plate activity complete</h1>
+        <p className="lead">You matched {correct} of {plates.length} generated plates. This is an informal screen activity, not a diagnosis.</p>
+        <p className="disclaimer">{DISCLAIMER}</p>
+        <div className="actions">
+          <button className="button primary" type="button" onClick={restart}>Try new random plates</button>
+          <button className="button secondary" type="button" onClick={() => setView('home')}>Back home</button>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="card view-panel plates-only">
+      <p className="eyebrow">α Alpha Ishihara-style activity</p>
+      <div className="progress-wrap">
+        <div className="progress-copy">
+          <span>Plate {index + 1} of {plates.length}</span>
+          <span>{Math.round(((index + 1) / plates.length) * 100)}% complete</span>
+        </div>
+        <div className="progress" role="progressbar" aria-valuemin={1} aria-valuemax={plates.length} aria-valuenow={index + 1} aria-label="Plate activity progress">
+          <span style={{ width: `${((index + 1) / plates.length) * 100}%` }} />
+        </div>
+      </div>
+      <h1>{current.title}</h1>
+      <p className="muted">Look at the dot plate and choose your first answer. The plate is randomly generated each time you start.</p>
+      <DotPlate plate={current} seed={seed + index * 997} />
+      <fieldset>
+        <legend className="small-legend">{current.prompt}</legend>
+        <div className="plate-answer-grid">
+          {PLATE_ONLY_RESPONSE_OPTIONS.map((answer) => (
+            <button
+              key={answer}
+              type="button"
+              className={responses[current.id] === answer ? 'button primary' : 'button secondary'}
+              onClick={() => setResponses((currentResponses) => ({ ...currentResponses, [current.id]: answer }))}
+            >
+              {answer}
+            </button>
+          ))}
+        </div>
+      </fieldset>
+      <div className="actions split">
+        <button className="button secondary" type="button" onClick={() => (index === 0 ? setView('home') : setIndex((currentIndex) => currentIndex - 1))}>Back</button>
+        <button className="button secondary" type="button" onClick={restart}>New random plates</button>
+        <button className="button primary" type="button" disabled={!responses[current.id]} onClick={() => setIndex((currentIndex) => currentIndex + 1)}>
+          {index === plates.length - 1 ? 'See plate result' : 'Next plate'}
         </button>
       </div>
     </section>
@@ -590,7 +744,9 @@ export default function App() {
   const hasSaved = Boolean(answers.ageGroup || answers.cvd || Object.keys(answers.friction).length || answers.worst || answers.pair);
 
   useEffect(() => {
-    document.title = view === 'results' ? 'Your Chromiview Report' : 'Chromiview | Colour Vision Screening';
+    if (view === 'results') document.title = 'Your Chromiview Report';
+    else if (view === 'plates') document.title = 'Chromiview Alpha | Ishihara-Style Plates';
+    else document.title = 'Chromiview | Colour Vision Screening';
   }, [view]);
 
   useEffect(() => {
@@ -620,6 +776,7 @@ export default function App() {
       {view === 'prepare' && <PreparationStep onStart={() => setView('screening')} />}
       {view === 'screening' && <ScreeningFlow answers={answers} setAnswers={setAnswers} setView={setView} restart={restart} />}
       {view === 'results' && <ResultsReport answers={answers} restart={restart} deleteData={deleteData} />}
+      {view === 'plates' && <PlatesOnlyTest setView={setView} />}
       {view === 'tools' && <ToolsView />}
       {view === 'learn' && <LearnView />}
       {view === 'privacy' && <PrivacyNotice deleteData={deleteData} />}

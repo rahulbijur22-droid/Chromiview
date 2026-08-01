@@ -123,6 +123,25 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 }
 .button.danger { border-color: var(--danger); color: var(--danger); }
 .button:disabled { opacity: .6; cursor: not-allowed; }
+.alpha-button {
+  position: relative;
+  overflow: visible;
+}
+.alpha-tag {
+  position: absolute;
+  top: -.7rem;
+  right: -.55rem;
+  border: 1.5px solid var(--text);
+  border-radius: 999px;
+  background: var(--brand);
+  color: #fff;
+  padding: .18rem .45rem;
+  font-size: .68rem;
+  line-height: 1;
+  font-weight: 900;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(16, 20, 38, .16);
+}
 
 .main-shell {
   padding: 1rem 0 2rem;
@@ -259,12 +278,20 @@ fieldset { border: 0; margin: 0; padding: 0; }
   border-radius: 50%;
   background: #fff;
 }
-.plate-symbol {
-  font-size: 48px;
-  font-weight: 900;
-  paint-order: stroke;
-  stroke: rgba(255, 255, 255, .45);
-  stroke-width: 2px;
+.dot-plate circle {
+  shape-rendering: geometricPrecision;
+}
+.plates-only .dot-plate { width: min(100%, 360px); margin-block: 1rem; }
+.plate-answer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(126px, 100%), 1fr));
+  gap: .65rem;
+  margin-top: .75rem;
+}
+.small-legend {
+  display: block;
+  font-size: 1.1rem;
+  margin-bottom: .45rem;
 }
 .plate-options {
   display: grid;

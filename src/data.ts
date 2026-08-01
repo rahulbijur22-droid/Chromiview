@@ -67,6 +67,7 @@ export const PLATE_QUESTIONS = [
     title: 'Colour picture 1',
     prompt: 'Can you see the star in the dots?',
     answer: 'star',
+    kind: 'star',
     fg: '#C43C32',
     bg: '#2CA85D',
   },
@@ -75,6 +76,7 @@ export const PLATE_QUESTIONS = [
     title: 'Colour picture 2',
     prompt: 'Can you see the circle in the dots?',
     answer: 'circle',
+    kind: 'ring',
     fg: '#1C83D4',
     bg: '#7048E8',
   },
@@ -83,8 +85,57 @@ export const PLATE_QUESTIONS = [
     title: 'Colour picture 3',
     prompt: 'Can you see the number 5 in the dots?',
     answer: 'number 5',
+    kind: 'five',
     fg: '#E9B949',
     bg: '#795548',
+  },
+];
+
+export const PLATE_ONLY_QUESTIONS = [
+  {
+    id: 'alpha_plate_1',
+    title: 'Plate 1',
+    prompt: 'What do you see?',
+    answer: 'star',
+    kind: 'star',
+    fg: '#C43C32',
+    bg: '#2CA85D',
+  },
+  {
+    id: 'alpha_plate_2',
+    title: 'Plate 2',
+    prompt: 'What do you see?',
+    answer: 'circle',
+    kind: 'ring',
+    fg: '#1C83D4',
+    bg: '#7048E8',
+  },
+  {
+    id: 'alpha_plate_3',
+    title: 'Plate 3',
+    prompt: 'What do you see?',
+    answer: '5',
+    kind: 'five',
+    fg: '#E9B949',
+    bg: '#795548',
+  },
+  {
+    id: 'alpha_plate_4',
+    title: 'Plate 4',
+    prompt: 'What do you see?',
+    answer: 'triangle',
+    kind: 'triangle',
+    fg: '#B83280',
+    bg: '#2F9E44',
+  },
+  {
+    id: 'alpha_plate_5',
+    title: 'Plate 5',
+    prompt: 'What do you see?',
+    answer: 'nothing',
+    kind: 'none',
+    fg: '#8A93A6',
+    bg: '#B6BECF',
   },
 ];
 
@@ -93,6 +144,8 @@ export const PLATE_RESPONSE_OPTIONS = [
   { value: 'maybe', label: 'Maybe / a little bit' },
   { value: 'no', label: "No, I can't see it" },
 ];
+
+export const PLATE_ONLY_RESPONSE_OPTIONS = ['star', 'circle', '5', 'triangle', 'nothing', 'not sure'];
 
 export const TOOL_OPTIONS = [
   { value: 'nothing', label: 'Nothing - I just adapt' },
