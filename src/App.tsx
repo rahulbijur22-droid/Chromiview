@@ -252,6 +252,13 @@ function DotPlate({ plate, seed }: { plate: PlateLike; seed?: number }) {
 }
 
 function Home({ setView, hasSaved }: { setView: (view: AppView) => void; hasSaved: boolean }) {
+  const openAlphaPlates = () => {
+    const shouldContinue = window.confirm(
+      'Alpha testing warning: this Ishihara-style activity is experimental, screen-based, and not a clinical colour-vision diagnosis. Continue?'
+    );
+    if (shouldContinue) setView('plates');
+  };
+
   return (
     <section className="hero-card view-panel">
       <p className="eyebrow">Kid-friendly colour activity</p>
@@ -264,9 +271,9 @@ function Home({ setView, hasSaved }: { setView: (view: AppView) => void; hasSave
         <button className="button primary" type="button" onClick={() => setView(hasSaved ? 'screening' : 'prepare')}>
           {hasSaved ? 'Resume screening' : 'Start screening'}
         </button>
-        <button className="button secondary alpha-button" type="button" onClick={() => setView('plates')}>
+        <button className="button secondary alpha-button" type="button" onClick={openAlphaPlates}>
           Ishihara-style test only
-          <span className="alpha-tag">α Alpha</span>
+          <span className="alpha-tag">Alpha</span>
         </button>
         <button className="button secondary" type="button" onClick={() => setView('tools')}>
           Open accessibility tools
@@ -300,7 +307,7 @@ function PlatesOnlyTest({ setView }: { setView: (view: AppView) => void }) {
   if (isDone) {
     return (
       <section className="card view-panel plates-only">
-        <p className="eyebrow">α Alpha Ishihara-style activity</p>
+        <p className="eyebrow">Alpha Ishihara-style activity</p>
         <h1>Plate activity complete</h1>
         <p className="lead">You matched {correct} of {plates.length} generated plates. This is an informal screen activity, not a diagnosis.</p>
         <p className="disclaimer">{DISCLAIMER}</p>
@@ -314,7 +321,7 @@ function PlatesOnlyTest({ setView }: { setView: (view: AppView) => void }) {
 
   return (
     <section className="card view-panel plates-only">
-      <p className="eyebrow">α Alpha Ishihara-style activity</p>
+      <p className="eyebrow">Alpha Ishihara-style activity</p>
       <div className="progress-wrap">
         <div className="progress-copy">
           <span>Plate {index + 1} of {plates.length}</span>
