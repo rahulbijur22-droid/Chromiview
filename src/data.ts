@@ -137,6 +137,69 @@ export const PLATE_ONLY_QUESTIONS = [
     fg: '#8A93A6',
     bg: '#B6BECF',
   },
+  {
+    id: 'alpha_plate_6',
+    title: 'Plate 6',
+    prompt: 'What do you see?',
+    answer: '2',
+    kind: 'two',
+    fg: '#C43C32',
+    bg: '#E67E22',
+  },
+  {
+    id: 'alpha_plate_7',
+    title: 'Plate 7',
+    prompt: 'What do you see?',
+    answer: '6',
+    kind: 'six',
+    fg: '#2F9E44',
+    bg: '#795548',
+  },
+  {
+    id: 'alpha_plate_8',
+    title: 'Plate 8',
+    prompt: 'What do you see?',
+    answer: '8',
+    kind: 'eight',
+    fg: '#1297F4',
+    bg: '#B83280',
+  },
+  {
+    id: 'alpha_plate_9',
+    title: 'Plate 9',
+    prompt: 'What do you see?',
+    answer: '9',
+    kind: 'nine',
+    fg: '#7048E8',
+    bg: '#1C83D4',
+  },
+  {
+    id: 'alpha_plate_10',
+    title: 'Plate 10',
+    prompt: 'What do you see?',
+    answer: 'square',
+    kind: 'square',
+    fg: '#E9B949',
+    bg: '#2CA85D',
+  },
+  {
+    id: 'alpha_plate_11',
+    title: 'Plate 11',
+    prompt: 'What do you see?',
+    answer: 'diamond',
+    kind: 'diamond',
+    fg: '#AE2F34',
+    bg: '#1C83D4',
+  },
+  {
+    id: 'alpha_plate_12',
+    title: 'Plate 12',
+    prompt: 'What do you see?',
+    answer: 'nothing',
+    kind: 'none',
+    fg: '#9AA6BB',
+    bg: '#C4CAD7',
+  },
 ];
 
 export const PLATE_RESPONSE_OPTIONS = [
@@ -145,7 +208,7 @@ export const PLATE_RESPONSE_OPTIONS = [
   { value: 'no', label: "No, I can't see it" },
 ];
 
-export const PLATE_ONLY_RESPONSE_OPTIONS = ['star', 'circle', '5', 'triangle', 'nothing', 'not sure'];
+export const PLATE_ONLY_RESPONSE_OPTIONS = ['star', 'circle', 'triangle', 'square', 'diamond', '2', '5', '6', '8', '9', 'nothing', 'not sure'];
 
 export const TOOL_OPTIONS = [
   { value: 'nothing', label: 'Nothing - I just adapt' },

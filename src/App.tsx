@@ -157,6 +157,27 @@ function colourVariant(hex: string, random: () => number) {
   return `rgb(${channels.map((channel) => Math.max(0, Math.min(255, channel + shift))).join(', ')})`;
 }
 
+function isInsideDigit(digit: string, x: number, y: number) {
+  const segmentsByDigit: Record<string, string[]> = {
+    two: ['top', 'upper-right', 'middle', 'lower-left', 'bottom'],
+    five: ['top', 'upper-left', 'middle', 'lower-right', 'bottom'],
+    six: ['top', 'upper-left', 'middle', 'lower-left', 'lower-right', 'bottom'],
+    eight: ['top', 'upper-left', 'upper-right', 'middle', 'lower-left', 'lower-right', 'bottom'],
+    nine: ['top', 'upper-left', 'upper-right', 'middle', 'lower-right', 'bottom'],
+  };
+  const segments = segmentsByDigit[digit] || [];
+  const active = {
+    top: x >= 36 && x <= 66 && y >= 23 && y <= 32,
+    middle: x >= 35 && x <= 65 && y >= 46 && y <= 55,
+    bottom: x >= 34 && x <= 64 && y >= 68 && y <= 77,
+    'upper-left': x >= 31 && x <= 42 && y >= 29 && y <= 50,
+    'upper-right': x >= 58 && x <= 69 && y >= 29 && y <= 50,
+    'lower-left': x >= 31 && x <= 42 && y >= 50 && y <= 71,
+    'lower-right': x >= 58 && x <= 69 && y >= 50 && y <= 71,
+  };
+  return segments.some((segment) => active[segment as keyof typeof active]);
+}
+
 function isInsidePlateSymbol(kind: string, x: number, y: number) {
   const dx = x - 50;
   const dy = y - 50;
@@ -173,14 +194,14 @@ function isInsidePlateSymbol(kind: string, x: number, y: number) {
   if (kind === 'triangle') {
     return y > 28 && y < 72 && x > 50 - (y - 22) * 0.72 && x < 50 + (y - 22) * 0.72;
   }
-  if (kind === 'five') {
-    return (
-      (x >= 34 && x <= 68 && y >= 25 && y <= 34) ||
-      (x >= 32 && x <= 43 && y >= 30 && y <= 52) ||
-      (x >= 34 && x <= 64 && y >= 47 && y <= 56) ||
-      (x >= 57 && x <= 69 && y >= 51 && y <= 72) ||
-      (x >= 34 && x <= 65 && y >= 67 && y <= 76)
-    );
+  if (kind === 'square') {
+    return Math.max(Math.abs(dx), Math.abs(dy)) < 22;
+  }
+  if (kind === 'diamond') {
+    return Math.abs(dx) + Math.abs(dy) < 31;
+  }
+  if (['two', 'five', 'six', 'eight', 'nine'].includes(kind)) {
+    return isInsideDigit(kind, x, y);
   }
   return false;
 }
