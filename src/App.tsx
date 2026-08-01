@@ -206,6 +206,25 @@ function isInsidePlateSymbol(kind: string, x: number, y: number) {
   return false;
 }
 
+function formatPlateAnswer(answer: string) {
+  return answer.charAt(0).toUpperCase() + answer.slice(1);
+}
+
+function buildPlateAnswerOptions(correctAnswer: string, seed: number, plateId: string) {
+  const random = seededRandom(seed + hashText(`${plateId}-answers`));
+  const wrongAnswers = PLATE_ONLY_RESPONSE_OPTIONS
+    .filter((answer) => answer !== correctAnswer)
+    .map((answer) => ({ answer, sort: random() }))
+    .sort((a, b) => a.sort - b.sort)
+    .slice(0, 3)
+    .map((item) => item.answer);
+
+  return [correctAnswer, ...wrongAnswers]
+    .map((answer) => ({ answer, sort: random() }))
+    .sort((a, b) => a.sort - b.sort)
+    .map((item) => item.answer);
+}
+
 type PlateLike = {
   id: string;
   title: string;
@@ -297,6 +316,7 @@ function PlatesOnlyTest({ setView }: { setView: (view: AppView) => void }) {
   const current = plates[index];
   const isDone = index >= plates.length;
   const correct = plates.filter((plate) => responses[plate.id] === plate.answer).length;
+  const answerOptions = current ? buildPlateAnswerOptions(current.answer, seed + index * 131, current.id) : [];
 
   const restart = () => {
     setSeed(Date.now());
@@ -337,14 +357,14 @@ function PlatesOnlyTest({ setView }: { setView: (view: AppView) => void }) {
       <fieldset>
         <legend className="small-legend">{current.prompt}</legend>
         <div className="plate-answer-grid">
-          {PLATE_ONLY_RESPONSE_OPTIONS.map((answer) => (
+          {answerOptions.map((answer) => (
             <button
               key={answer}
               type="button"
               className={responses[current.id] === answer ? 'button primary' : 'button secondary'}
               onClick={() => setResponses((currentResponses) => ({ ...currentResponses, [current.id]: answer }))}
             >
-              {answer}
+              {formatPlateAnswer(answer)}
             </button>
           ))}
         </div>
@@ -394,6 +414,7 @@ function ScreeningFlow({
 }) {
   const [step, setStep] = useState(1);
   const [error, setError] = useState('');
+  const [plateSeed] = useState(() => Date.now());
   const headingRef = useRef<HTMLLegendElement>(null);
 
   useEffect(() => {
@@ -476,9 +497,9 @@ function ScreeningFlow({
           <legend ref={headingRef} tabIndex={-1}>Colour picture activity</legend>
           <p className="muted">These dot pictures are inspired by traditional colour-vision plates, but they are not clinical tests. Ask: “Can you see it?”</p>
           <div className="plate-grid">
-            {PLATE_QUESTIONS.map((plate) => (
+            {PLATE_QUESTIONS.map((plate, plateIndex) => (
               <article className="plate-card" key={plate.id}>
-                <DotPlate plate={plate} />
+                <DotPlate plate={plate} seed={plateSeed + plateIndex * 811} />
                 <h2>{plate.title}</h2>
                 <p>{plate.prompt}</p>
                 <div className="plate-options" role="radiogroup" aria-label={plate.prompt}>

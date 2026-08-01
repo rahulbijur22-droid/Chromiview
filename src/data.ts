@@ -208,7 +208,7 @@ export const PLATE_RESPONSE_OPTIONS = [
   { value: 'no', label: "No, I can't see it" },
 ];
 
-export const PLATE_ONLY_RESPONSE_OPTIONS = ['star', 'circle', 'triangle', 'square', 'diamond', '2', '5', '6', '8', '9', 'nothing', 'not sure'];
+export const PLATE_ONLY_RESPONSE_OPTIONS = ['star', 'circle', 'triangle', 'square', 'diamond', '2', '5', '6', '8', '9', 'nothing'];
 
 export const TOOL_OPTIONS = [
   { value: 'nothing', label: 'Nothing - I just adapt' },
