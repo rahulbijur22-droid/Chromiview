@@ -124,10 +124,13 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 .button.danger { border-color: var(--danger); color: var(--danger); }
 .button:disabled { opacity: .6; cursor: not-allowed; }
 
-.main-shell { padding: 1rem 0 2rem; }
+.main-shell {
+  padding: 1rem 0 2rem;
+}
 .settings-panel {
+  width: min(100%, 960px);
   justify-content: flex-end;
-  margin-bottom: 1rem;
+  margin: 0 auto 1.5rem;
 }
 .settings-panel label, .field {
   display: grid;
@@ -138,6 +141,8 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 
 .view-panel {
   animation: fade-in 160ms ease-out;
+  width: min(100%, 960px);
+  margin-inline: auto;
 }
 
 .card, .hero-card {
@@ -147,7 +152,10 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
   box-shadow: var(--shadow);
   padding: clamp(1rem, 3vw, 2rem);
 }
-.hero-card { max-width: 840px; }
+.hero-card {
+  max-width: 960px;
+  margin-inline: auto;
+}
 
 .eyebrow {
   color: var(--brand);
@@ -159,6 +167,9 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 h1, h2, legend { color: var(--text); line-height: 1.12; }
 h1 { font-size: clamp(2rem, 6vw, 4rem); margin: .2rem 0 .8rem; }
 h2, legend { font-size: clamp(1.3rem, 3vw, 1.9rem); font-weight: 850; margin-bottom: .5rem; }
+legend:focus {
+  outline: 0;
+}
 p, li, small { line-height: 1.65; }
 .lead { font-size: 1.12rem; color: var(--muted); max-width: 68ch; }
 .muted, .disclaimer { color: var(--muted); }
@@ -173,22 +184,41 @@ fieldset { border: 0; margin: 0; padding: 0; }
 .choice-stack, .scale-stack { display: grid; gap: .75rem; margin-top: 1rem; }
 .choice-card {
   display: grid;
-  grid-template-columns: auto 1fr;
-  gap: .75rem;
-  align-items: start;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 1rem;
+  align-items: center;
   border: 1.5px solid var(--border);
   border-radius: .85rem;
-  padding: .9rem;
+  padding: 1rem;
   background: var(--surface);
+  min-height: 72px;
+}
+.choice-card input {
+  margin: 0;
+  justify-self: center;
+}
+.choice-card strong {
+  display: block;
 }
 .choice-card:has(input:checked), .pair-card.selected, .scale-buttons .selected {
   border-color: var(--text);
   box-shadow: inset 0 0 0 2px var(--brand);
 }
-.choice-card small { display: block; color: var(--muted); }
+.choice-card small {
+  display: block;
+  color: var(--muted);
+  margin-top: .2rem;
+}
 
 .progress-wrap { margin-bottom: 1.25rem; }
-.progress-copy { display: flex; justify-content: space-between; gap: 1rem; color: var(--muted); font-weight: 800; }
+.progress-copy {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--muted);
+  font-weight: 800;
+  margin-bottom: .35rem;
+}
 .progress {
   height: .7rem;
   background: var(--surface-2);
@@ -205,7 +235,7 @@ fieldset { border: 0; margin: 0; padding: 0; }
 
 .pair-grid, .result-grid, .tools-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
   gap: 1rem;
 }
 .plate-grid {
@@ -254,7 +284,25 @@ fieldset { border: 0; margin: 0; padding: 0; }
   border-color: var(--text);
   box-shadow: inset 0 0 0 2px var(--brand);
 }
-.pair-card { text-align: left; background: var(--surface); color: var(--text); border: 1.5px solid var(--border); border-radius: .9rem; padding: .8rem; }
+.pair-card {
+  text-align: left;
+  background: var(--surface);
+  color: var(--text);
+  border: 1.5px solid var(--border);
+  border-radius: .9rem;
+  padding: .9rem;
+  min-height: 178px;
+}
+.pair-card strong {
+  display: block;
+  line-height: 1.25;
+  margin-bottom: .25rem;
+}
+.pair-card small {
+  display: block;
+  color: var(--muted);
+  line-height: 1.45;
+}
 .pair-swatch { display: block; height: 64px; border: 1.5px solid var(--border); border-radius: .65rem; margin-bottom: .55rem; }
 
 .field input, .field textarea {
@@ -297,6 +345,9 @@ fieldset { border: 0; margin: 0; padding: 0; }
   .site-nav button, .actions .button { flex: 1 1 auto; }
   .actions { flex-direction: column; align-items: stretch; }
   .settings-panel { justify-content: stretch; }
+  .choice-card {
+    align-items: start;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
