@@ -673,6 +673,123 @@ function ScreeningFlow({
   );
 }
 
+type ReportDownload = {
+  generatedAt: string;
+  ageGroup: string;
+  likelyType: string;
+  likelyReason: string;
+  reportedPattern: string;
+  responseConsistency: string;
+  observedPatterns: string[];
+  difficultSituations: string;
+  recommendations: string[];
+  limitations: string[];
+};
+
+function normalisePdfText(text: string) {
+  return text
+    .replace(/[“”]/g, '"')
+    .replace(/[‘’]/g, "'")
+    .replace(/[–—]/g, '-')
+    .replace(/[^\x20-\x7E]/g, '');
+}
+
+function escapePdfText(text: string) {
+  return normalisePdfText(text).replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
+}
+
+function wrapPdfText(text: string, maxLength = 86) {
+  const words = normalisePdfText(text).split(/\s+/).filter(Boolean);
+  const lines: string[] = [];
+  let current = '';
+
+  words.forEach((word) => {
+    const next = current ? `${current} ${word}` : word;
+    if (next.length > maxLength && current) {
+      lines.push(current);
+      current = word;
+    } else {
+      current = next;
+    }
+  });
+  if (current) lines.push(current);
+  return lines;
+}
+
+function buildReportPdf(report: ReportDownload, summary: string) {
+  const rows: { text: string; size: number; font: 'regular' | 'bold'; gap: number }[] = [];
+  const addHeading = (text: string) => rows.push({ text, size: 14, font: 'bold', gap: 19 });
+  const addParagraph = (text: string) => {
+    wrapPdfText(text).forEach((line) => rows.push({ text: line, size: 10, font: 'regular', gap: 14 }));
+    rows.push({ text: '', size: 10, font: 'regular', gap: 8 });
+  };
+  const addList = (items: string[]) => {
+    items.forEach((item) => wrapPdfText(`- ${item}`, 84).forEach((line) => rows.push({ text: line, size: 10, font: 'regular', gap: 14 })));
+    rows.push({ text: '', size: 10, font: 'regular', gap: 8 });
+  };
+
+  rows.push({ text: 'Chromiview Colour-Vision Accessibility Report', size: 18, font: 'bold', gap: 25 });
+  addParagraph(`Generated: ${new Date(report.generatedAt).toLocaleString()}`);
+  addHeading('Most likely indication');
+  addParagraph(report.likelyType);
+  addParagraph(report.likelyReason);
+  addHeading('Reported colour-vision pattern');
+  addParagraph(report.reportedPattern);
+  addHeading('Response consistency');
+  addParagraph(report.responseConsistency);
+  addHeading('Most difficult situations');
+  addParagraph(report.difficultSituations);
+  addHeading('What responses suggest');
+  addList(report.observedPatterns);
+  addHeading('Personalised summary');
+  addParagraph(summary);
+  addHeading('Practical adaptations');
+  addList(report.recommendations);
+  addHeading('Limitations');
+  addList(report.limitations);
+  addParagraph(DISCLAIMER);
+
+  const pages: string[][] = [[]];
+  let y = 742;
+  rows.forEach((row) => {
+    if (y < 64 && row.text) {
+      pages.push([]);
+      y = 742;
+    }
+    if (row.text) pages[pages.length - 1].push(`BT /${row.font === 'bold' ? 'F2' : 'F1'} ${row.size} Tf 54 ${y} Td (${escapePdfText(row.text)}) Tj ET`);
+    y -= row.gap;
+  });
+
+  const objects = [
+    '<< /Type /Catalog /Pages 2 0 R >>',
+    `<< /Type /Pages /Kids [${pages.map((_, index) => `${5 + index * 2} 0 R`).join(' ')}] /Count ${pages.length} >>`,
+    '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>',
+    '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>',
+  ];
+  pages.forEach((page, index) => {
+    const pageObjectId = 5 + index * 2;
+    const contentObjectId = pageObjectId + 1;
+    const stream = page.join('\n');
+    objects.push(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ${contentObjectId} 0 R >>`);
+    objects.push(`<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`);
+  });
+
+  let pdf = '%PDF-1.4\n';
+  const offsets = [0];
+  objects.forEach((object, index) => {
+    offsets.push(pdf.length);
+    pdf += `${index + 1} 0 obj\n${object}\nendobj\n`;
+  });
+  const xrefOffset = pdf.length;
+  pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+  offsets.slice(1).forEach((offset) => {
+    pdf += `${offset.toString().padStart(10, '0')} 00000 n \n`;
+  });
+  pdf += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
+
+  return new Blob([pdf], { type: 'application/pdf' });
+}
+
 function ResultsReport({ answers, restart, deleteData }: { answers: Answers; restart: () => void; deleteData: () => void }) {
   const result = useMemo(() => inferResult(answers), [answers]);
   const recommendations = useMemo(() => buildRecommendations(answers, result), [answers, result]);
@@ -692,11 +809,16 @@ function ResultsReport({ answers, restart, deleteData }: { answers: Answers; res
   };
 
   const download = () => {
-    const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+    const shouldDownload = window.confirm(
+      'Download a PDF copy of this report? It may include health-related answers. Only save or share it with a parent, guardian, teacher, or eye-care professional you trust.'
+    );
+    if (!shouldDownload) return;
+
+    const blob = buildReportPdf(report, summary);
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `chromiview-report-${new Date().toISOString().slice(0, 10)}.json`;
+    link.download = `chromiview-report-${new Date().toISOString().slice(0, 10)}.pdf`;
     document.body.appendChild(link);
     link.click();
     link.remove();
@@ -753,7 +875,7 @@ function ResultsReport({ answers, restart, deleteData }: { answers: Answers; res
       </div>
       <div className="actions">
         <button className="button primary" type="button" onClick={() => window.print()}>Print or save PDF</button>
-        <button className="button secondary" type="button" onClick={download}>Download structured report</button>
+        <button className="button secondary" type="button" onClick={download}>Download PDF report</button>
         <button className="button secondary" type="button" onClick={() => saveHistory(report)}>Save result history locally</button>
         <button className="button secondary" type="button" onClick={restart}>Retake screening</button>
         <button className="button danger" type="button" onClick={deleteData}>Delete local results</button>
