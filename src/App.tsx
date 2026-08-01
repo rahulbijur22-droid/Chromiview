@@ -385,8 +385,7 @@ function PlatesOnlyTest({ setView }: { setView: (view: AppView) => void }) {
           <span style={{ width: `${((index + 1) / plates.length) * 100}%` }} />
         </div>
       </div>
-      <h1>{current.title}</h1>
-      <p className="muted">Look at the dot plate and choose your first answer. The plate is randomly generated each time you start.</p>
+      <p className="muted">Look at the dot plate and choose your first answer. Each run uses a randomized plate order.</p>
       <DotPlate plate={current} seed={seed + index * 997} />
       <fieldset>
         <legend className="small-legend">{current.prompt}</legend>
