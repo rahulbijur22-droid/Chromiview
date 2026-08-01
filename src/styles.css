@@ -359,6 +359,14 @@ fieldset { border: 0; margin: 0; padding: 0; }
 .split { justify-content: space-between; margin-top: 1.25rem; }
 
 .report .card { box-shadow: none; margin-top: 1rem; }
+.likely-result-card {
+  border-color: var(--brand);
+  background: var(--surface-2);
+}
+.likely-result-card h2 {
+  font-size: clamp(1.7rem, 4vw, 2.8rem);
+  margin-top: .15rem;
+}
 .metric { font-size: 2rem; font-weight: 900; }
 .palette-list { padding: 0; list-style: none; display: grid; gap: .65rem; }
 .palette-list li { display: flex; gap: .65rem; align-items: center; }

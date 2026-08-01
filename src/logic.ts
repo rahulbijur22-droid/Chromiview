@@ -20,16 +20,122 @@ export function getTopFriction(friction: Record<string, number>) {
   return entries.sort((a, b) => b[1] - a[1])[0][0];
 }
 
+function inferLikelyType(answers: Answers, missedPlateIds: string[]) {
+  const scores = {
+    typical: 0,
+    deutan: 0,
+    protan: 0,
+    tritan: 0,
+    achromatopsia: 0,
+  };
+  const reasons: string[] = [];
+
+  if (answers.cvd === 'none') {
+    scores.typical += 3;
+    reasons.push('You reported typical colour vision.');
+  }
+  if (answers.cvd === 'rg_d') {
+    scores.deutan += 5;
+    reasons.push('You reported a deutan-family red-green pattern.');
+  }
+  if (answers.cvd === 'rg_p') {
+    scores.protan += 5;
+    reasons.push('You reported a protan-family red-green pattern.');
+  }
+  if (answers.cvd === 'by') {
+    scores.tritan += 5;
+    reasons.push('You reported a blue-yellow/tritan-family pattern.');
+  }
+  if (answers.cvd === 'total') {
+    scores.achromatopsia += 6;
+    reasons.push('You reported very limited colour perception.');
+  }
+
+  if (answers.pair === 'rg') {
+    scores.deutan += 3;
+    scores.protan += 3;
+    reasons.push('Red vs green was selected as the hardest colour pair.');
+  }
+  if (answers.pair === 'rb') {
+    scores.protan += 3;
+    scores.deutan += 1;
+    reasons.push('Red vs black was selected, which can align with protan-family red darkening.');
+  }
+  if (answers.pair === 'og') {
+    scores.deutan += 2;
+    scores.protan += 2;
+    reasons.push('Orange vs brown was selected, which often sits near red-green confusion.');
+  }
+  if (answers.pair === 'by') {
+    scores.tritan += 3;
+    reasons.push('Blue vs yellow was selected as the hardest colour pair.');
+  }
+  if (answers.pair === 'bp') {
+    scores.tritan += 2;
+    scores.deutan += 1;
+    scores.protan += 1;
+    reasons.push('Blue vs purple was selected, which can appear in tritan-like or red-green patterns.');
+  }
+  if (answers.pair === 'none') {
+    scores.typical += 1;
+    reasons.push('No listed colour pair was selected as difficult.');
+  }
+
+  if (missedPlateIds.includes('plate_star')) {
+    scores.deutan += 2;
+    scores.protan += 2;
+    reasons.push('The red-green colour picture was marked maybe or no.');
+  }
+  if (missedPlateIds.includes('plate_circle')) {
+    scores.tritan += 2;
+    scores.deutan += 1;
+    scores.protan += 1;
+    reasons.push('The blue-purple colour picture was marked maybe or no.');
+  }
+  if (missedPlateIds.includes('plate_number')) {
+    scores.tritan += 1;
+    scores.deutan += 1;
+    scores.protan += 1;
+    reasons.push('The yellow-brown number picture was marked maybe or no.');
+  }
+  if (!missedPlateIds.length) scores.typical += 1;
+
+  const ranked = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+  const [topKey, topScore] = ranked[0];
+  const [, secondScore] = ranked[1];
+  const labels: Record<string, string> = {
+    typical: 'Typical colour vision / no strong CVD pattern',
+    deutan: 'Deutan-family red-green colour vision deficiency',
+    protan: 'Protan-family red-green colour vision deficiency',
+    tritan: 'Tritan-family blue-yellow colour vision deficiency',
+    achromatopsia: 'Very limited colour perception / achromatopsia-like pattern',
+  };
+
+  if (topScore === 0) {
+    return {
+      likelyType: 'Not enough information yet',
+      likelyReason: 'Chromiview needs completed colour-picture, colour-pair, and self-report answers before it can offer a useful indication.',
+    };
+  }
+
+  const confidenceText = topScore === secondScore ? 'This is a close match, so treat it as low confidence.' : 'This was the strongest pattern in your answers.';
+  return {
+    likelyType: labels[topKey],
+    likelyReason: `${confidenceText} ${reasons.slice(0, 3).join(' ')}`,
+  };
+}
+
 export function inferResult(answers: Answers): ResultSummary {
   const reportedPattern = CVD_OPTIONS.find((option) => option.value === answers.cvd)?.label || 'Not reported';
   const pair = COLOR_PAIRS.find((option) => option.id === answers.pair);
   const topArea = getTopFriction(answers.friction);
+  const missedPlates = PLATE_QUESTIONS.filter((plate) => ['no', 'maybe'].includes(answers.plateResponses[plate.id]));
+  const likely = inferLikelyType(answers, missedPlates.map((plate) => plate.id));
   const observedPatterns = [
     answers.ageGroup ? `Age group: ${AGE_OPTIONS.find((option) => option.value === answers.ageGroup)?.label || answers.ageGroup}.` : 'Age group was skipped.',
     pair ? `Selected difficult pair: ${pair.label} (${pair.pattern}).` : 'No colour-pair pattern selected.',
     topArea ? `Highest daily friction: ${labelForArea(topArea)}.` : 'Daily friction ratings are incomplete.',
   ];
-  const missedPlates = PLATE_QUESTIONS.filter((plate) => ['no', 'maybe'].includes(answers.plateResponses[plate.id]));
   if (missedPlates.length) {
     observedPatterns.push(`Colour picture activity: ${missedPlates.length} of ${PLATE_QUESTIONS.length} cards were marked “maybe” or “no”.`);
   }
@@ -41,6 +147,8 @@ export function inferResult(answers: Answers): ResultSummary {
     selfReportMatchesPair || tritanMatchesPair || limitedMatches ? 'Moderate' : answers.cvd && answers.pair ? 'Mixed' : 'Limited';
 
   return {
+    likelyType: likely.likelyType,
+    likelyReason: likely.likelyReason,
     reportedPattern,
     observedPatterns,
     responseConsistency,
@@ -79,7 +187,7 @@ export function buildPersonalSummary(answers: Answers, result: ResultSummary) {
     answers.tools.length === 0 || answers.tools.includes('nothing')
       ? 'You are mostly adapting without dedicated tools.'
       : `You already use ${answers.tools.length} support option${answers.tools.length === 1 ? '' : 's'}.`;
-  return `${result.reportedPattern} is your reported pattern, and your responses point most strongly to ${area.toLowerCase()} as the area to improve first. ${toolText} Start with one repeatable adaptation and test whether it reduces mistakes or stress over a week.`;
+  return `${result.likelyType} is the strongest indication from your answers, and ${result.reportedPattern} is your reported pattern. Your responses point most strongly to ${area.toLowerCase()} as the area to improve first. ${toolText} Start with one repeatable adaptation and test whether it reduces mistakes or stress over a week.`;
 }
 
 export function validateStep(step: number, answers: Answers) {

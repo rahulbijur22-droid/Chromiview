@@ -17,6 +17,8 @@ export type Answers = {
 };
 
 export type ResultSummary = {
+  likelyType: string;
+  likelyReason: string;
   reportedPattern: string;
   observedPatterns: string[];
   responseConsistency: 'Limited' | 'Moderate' | 'Mixed';

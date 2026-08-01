@@ -681,6 +681,8 @@ function ResultsReport({ answers, restart, deleteData }: { answers: Answers; res
   const report = {
     generatedAt: new Date().toISOString(),
     ageGroup: answers.ageGroup,
+    likelyType: result.likelyType,
+    likelyReason: result.likelyReason,
     reportedPattern: result.reportedPattern,
     responseConsistency: result.responseConsistency,
     observedPatterns: result.observedPatterns,
@@ -706,6 +708,12 @@ function ResultsReport({ answers, restart, deleteData }: { answers: Answers; res
       <div className="report-print">
         <p className="eyebrow">Your report</p>
         <h1>Your colour-vision accessibility report</h1>
+        <article className="card likely-result-card">
+          <p className="eyebrow">Most likely indication</p>
+          <h2>{result.likelyType}</h2>
+          <p>{result.likelyReason}</p>
+          <small>This is an informal screen-based indication, not a clinical diagnosis.</small>
+        </article>
         <p className="disclaimer">{DISCLAIMER}</p>
         <div className="result-grid">
           <article className="card">
