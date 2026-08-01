@@ -288,6 +288,20 @@ fieldset { border: 0; margin: 0; padding: 0; }
   gap: .65rem;
   margin-top: .75rem;
 }
+.plate-summary-card { margin-top: 1rem; box-shadow: none; }
+.plate-result-list {
+  display: grid;
+  gap: .75rem;
+  padding-left: 1.2rem;
+}
+.plate-result-list li span,
+.plate-result-list li small {
+  display: block;
+}
+.plate-result-list li small {
+  color: var(--muted);
+  margin-top: .15rem;
+}
 .small-legend {
   display: block;
   font-size: 1.1rem;

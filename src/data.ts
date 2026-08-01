@@ -70,6 +70,7 @@ export const PLATE_QUESTIONS = [
     kind: 'star',
     fg: '#C43C32',
     bg: '#2CA85D',
+    interpretation: 'Missing this red-green plate may point toward red-green difficulty, which can be seen in deutan or protan patterns.',
   },
   {
     id: 'plate_circle',
@@ -79,6 +80,7 @@ export const PLATE_QUESTIONS = [
     kind: 'ring',
     fg: '#1C83D4',
     bg: '#7048E8',
+    interpretation: 'Missing this blue-purple plate may point toward blue-purple or blue-yellow difficulty, sometimes associated with tritan patterns.',
   },
   {
     id: 'plate_number',
@@ -88,6 +90,7 @@ export const PLATE_QUESTIONS = [
     kind: 'five',
     fg: '#E9B949',
     bg: '#795548',
+    interpretation: 'Missing this yellow-brown number plate may point toward reduced colour separation when colours have similar warmth or brightness.',
   },
 ];
 
@@ -127,6 +130,7 @@ export const PLATE_ONLY_QUESTIONS = [
     kind: 'triangle',
     fg: '#B83280',
     bg: '#2F9E44',
+    interpretation: 'Missing this magenta-green plate may point toward red-green family difficulty, including deutan or protan patterns.',
   },
   {
     id: 'alpha_plate_5',
@@ -136,6 +140,7 @@ export const PLATE_ONLY_QUESTIONS = [
     kind: 'none',
     fg: '#8A93A6',
     bg: '#B6BECF',
+    interpretation: 'Choosing a symbol on a no-symbol control can suggest guessing, screen glare, or that the generated plate was confusing.',
   },
   {
     id: 'alpha_plate_6',
@@ -145,6 +150,7 @@ export const PLATE_ONLY_QUESTIONS = [
     kind: 'two',
     fg: '#C43C32',
     bg: '#E67E22',
+    interpretation: 'Missing this red-orange plate may point toward reduced red sensitivity, which can be seen more often in protan patterns.',
   },
   {
     id: 'alpha_plate_7',
@@ -154,6 +160,7 @@ export const PLATE_ONLY_QUESTIONS = [
     kind: 'six',
     fg: '#2F9E44',
     bg: '#795548',
+    interpretation: 'Missing this green-brown plate may point toward red-green family difficulty, often relevant to deutan or protan patterns.',
   },
   {
     id: 'alpha_plate_8',
@@ -163,6 +170,7 @@ export const PLATE_ONLY_QUESTIONS = [
     kind: 'eight',
     fg: '#1297F4',
     bg: '#B83280',
+    interpretation: 'Missing this blue-pink plate may point toward difficulty separating blues, purples, and pinks; it does not identify one type by itself.',
   },
   {
     id: 'alpha_plate_9',
@@ -172,6 +180,7 @@ export const PLATE_ONLY_QUESTIONS = [
     kind: 'nine',
     fg: '#7048E8',
     bg: '#1C83D4',
+    interpretation: 'Missing this purple-blue plate may point toward blue-purple difficulty, which can overlap with tritan-like patterns.',
   },
   {
     id: 'alpha_plate_10',
@@ -181,6 +190,7 @@ export const PLATE_ONLY_QUESTIONS = [
     kind: 'square',
     fg: '#E9B949',
     bg: '#2CA85D',
+    interpretation: 'Missing this yellow-green plate may point toward green-yellow separation difficulty, which can happen across several CVD patterns.',
   },
   {
     id: 'alpha_plate_11',
@@ -190,6 +200,7 @@ export const PLATE_ONLY_QUESTIONS = [
     kind: 'diamond',
     fg: '#AE2F34',
     bg: '#1C83D4',
+    interpretation: 'Missing this red-blue plate may point toward trouble using hue alone; compare it with the red-green and blue-purple results.',
   },
   {
     id: 'alpha_plate_12',
@@ -199,6 +210,7 @@ export const PLATE_ONLY_QUESTIONS = [
     kind: 'none',
     fg: '#9AA6BB',
     bg: '#C4CAD7',
+    interpretation: 'Choosing a symbol on this no-symbol control can suggest the plate set may be too noisy or the user is guessing.',
   },
 ];
 

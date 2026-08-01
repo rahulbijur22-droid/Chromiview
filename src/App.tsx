@@ -150,6 +150,13 @@ function hashText(text: string) {
   return text.split('').reduce((hash, char) => (hash * 31 + char.charCodeAt(0)) >>> 0, 2166136261);
 }
 
+function createPlateRunSeed() {
+  const cryptoValue = globalThis.crypto?.getRandomValues
+    ? globalThis.crypto.getRandomValues(new Uint32Array(1))[0]
+    : Math.floor(Math.random() * 2147483646);
+  return (Date.now() ^ cryptoValue) >>> 0;
+}
+
 function colourVariant(hex: string, random: () => number) {
   const clean = hex.replace('#', '');
   const channels = [0, 2, 4].map((start) => parseInt(clean.slice(start, start + 2), 16));
@@ -233,6 +240,7 @@ type PlateLike = {
   kind: string;
   fg: string;
   bg: string;
+  interpretation?: string;
 };
 
 function DotPlate({ plate, seed }: { plate: PlateLike; seed?: number }) {
@@ -303,7 +311,7 @@ function Home({ setView, hasSaved }: { setView: (view: AppView) => void; hasSave
 }
 
 function PlatesOnlyTest({ setView }: { setView: (view: AppView) => void }) {
-  const [seed, setSeed] = useState(() => Date.now());
+  const [seed, setSeed] = useState(() => createPlateRunSeed());
   const [index, setIndex] = useState(0);
   const [responses, setResponses] = useState<Record<string, string>>({});
   const plates = useMemo(() => {
@@ -316,10 +324,12 @@ function PlatesOnlyTest({ setView }: { setView: (view: AppView) => void }) {
   const current = plates[index];
   const isDone = index >= plates.length;
   const correct = plates.filter((plate) => responses[plate.id] === plate.answer).length;
+  const missedPlates = plates.filter((plate) => responses[plate.id] !== plate.answer);
+  const interpretations = Array.from(new Set(missedPlates.map((plate) => plate.interpretation).filter(Boolean)));
   const answerOptions = current ? buildPlateAnswerOptions(current.answer, seed + index * 131, current.id) : [];
 
   const restart = () => {
-    setSeed(Date.now());
+    setSeed(createPlateRunSeed());
     setIndex(0);
     setResponses({});
   };
@@ -329,8 +339,32 @@ function PlatesOnlyTest({ setView }: { setView: (view: AppView) => void }) {
       <section className="card view-panel plates-only">
         <p className="eyebrow">Alpha Ishihara-style activity</p>
         <h1>Plate activity complete</h1>
-        <p className="lead">You matched {correct} of {plates.length} generated plates. This is an informal screen activity, not a diagnosis.</p>
+        <p className="lead">You matched {correct} of {plates.length} generated plates and missed {missedPlates.length}. This is an informal screen activity, not a diagnosis.</p>
         <p className="disclaimer">{DISCLAIMER}</p>
+        <article className="card plate-summary-card">
+          <h2>Result overview</h2>
+          {missedPlates.length === 0 ? (
+            <p>No missed plates in this run. That does not prove typical colour vision, but it means this alpha activity did not flag a clear pattern today.</p>
+          ) : (
+            <ul className="plate-result-list">
+              {missedPlates.map((plate) => (
+                <li key={plate.id}>
+                  <strong>{plate.title}</strong>
+                  <span>You chose {formatPlateAnswer(responses[plate.id] || 'no answer')}; the expected answer was {formatPlateAnswer(plate.answer)}.</span>
+                  {plate.interpretation && <small>{plate.interpretation}</small>}
+                </li>
+              ))}
+            </ul>
+          )}
+        </article>
+        <article className="card plate-summary-card">
+          <h2>What this may suggest</h2>
+          {interpretations.length ? (
+            <ul>{interpretations.map((item) => <li key={item}>{item}</li>)}</ul>
+          ) : (
+            <p>No specific colour-confusion pattern was suggested by this alpha run.</p>
+          )}
+        </article>
         <div className="actions">
           <button className="button primary" type="button" onClick={restart}>Try new random plates</button>
           <button className="button secondary" type="button" onClick={() => setView('home')}>Back home</button>
@@ -414,7 +448,7 @@ function ScreeningFlow({
 }) {
   const [step, setStep] = useState(1);
   const [error, setError] = useState('');
-  const [plateSeed] = useState(() => Date.now());
+  const [plateSeed] = useState(() => createPlateRunSeed());
   const headingRef = useRef<HTMLLegendElement>(null);
 
   useEffect(() => {
