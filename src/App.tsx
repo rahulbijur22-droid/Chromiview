@@ -284,6 +284,12 @@ function DotPlate({ plate, seed }: { plate: PlateLike; seed?: number }) {
 }
 
 function Home({ setView, hasSaved, theme }: { setView: (view: AppView) => void; hasSaved: boolean; theme: ThemeMode }) {
+  const [isPreparing, setIsPreparing] = useState(false);
+  const [showHowItWorks, setShowHowItWorks] = useState(false);
+  const startScreening = () => {
+    setIsPreparing(true);
+    window.setTimeout(() => setView(hasSaved ? 'screening' : 'prepare'), 650);
+  };
   const openAlphaPlates = () => {
     const shouldContinue = window.confirm(
       'Alpha testing warning: this Ishihara-style activity is experimental, screen-based, and not a clinical colour-vision diagnosis. Continue?'
@@ -292,34 +298,67 @@ function Home({ setView, hasSaved, theme }: { setView: (view: AppView) => void; 
   };
 
   return (
-    <section className="hero-card view-panel">
-      <img
-        className="hero-banner"
-        src={BANNER_BY_THEME[theme]}
-        width="2508"
-        height="627"
-        alt="Chromiview: Seeing the world in full color. AI-powered colorblindness assessment."
-        decoding="async"
-      />
-      <p className="eyebrow">Kid-friendly colour activity</p>
-      <h1>Explore how colours feel in everyday life.</h1>
-      <p className="lead">
-        Chromiview combines an age question, simple colour-picture activities, labelled colour pairs, practical tips, and a printable report. It is friendly for classroom demos when a grown-up reads along.
-      </p>
-      <p className="disclaimer">{DISCLAIMER}</p>
-      <div className="actions">
-        <button className="button primary" type="button" onClick={() => setView(hasSaved ? 'screening' : 'prepare')}>
-          {hasSaved ? 'Resume screening' : 'Start screening'}
-        </button>
-        <button className="button secondary alpha-button" type="button" onClick={openAlphaPlates}>
-          Ishihara-style test only
-          <span className="alpha-tag">Alpha</span>
-        </button>
-        <button className="button secondary" type="button" onClick={() => setView('tools')}>
-          Open accessibility tools
-        </button>
-      </div>
-    </section>
+    <>
+      {isPreparing && (
+        <div className="loading-overlay" role="status" aria-live="polite">
+          <div className="loading-card">
+            <Logo />
+            <strong>Getting ready...</strong>
+            <div className="loading-bar" aria-hidden="true">
+              <span />
+            </div>
+            <small>Tip: Use a bright screen in soft light.</small>
+          </div>
+        </div>
+      )}
+
+      {showHowItWorks && (
+        <div className="modal-backdrop" role="presentation" onClick={() => setShowHowItWorks(false)}>
+          <section className="info-modal" role="dialog" aria-modal="true" aria-labelledby="how-it-works-title" onClick={(event) => event.stopPropagation()}>
+            <h2 id="how-it-works-title">How it works</h2>
+            <ul>
+              <li>Answer simple colour questions.</li>
+              <li>Try short dot-picture activities.</li>
+              <li>Get a clear report and tips.</li>
+            </ul>
+            <div className="actions">
+              <button className="button primary" type="button" onClick={startScreening}>Start</button>
+              <button className="button secondary" type="button" onClick={() => setShowHowItWorks(false)}>Close</button>
+            </div>
+          </section>
+        </div>
+      )}
+
+      <section className="hero-card view-panel">
+        <img
+          className="hero-banner"
+          src={BANNER_BY_THEME[theme]}
+          width="2508"
+          height="627"
+          alt="Chromiview: Seeing the world in full color. AI-powered colorblindness assessment."
+          decoding="async"
+        />
+        <p className="eyebrow">Colour check</p>
+        <h1>Check how you see colour.</h1>
+        <p className="lead">A quick, friendly screen check with tips at the end.</p>
+        <p className="disclaimer">{DISCLAIMER}</p>
+        <div className="actions">
+          <button className="button primary" type="button" onClick={startScreening}>
+            {hasSaved ? 'Resume' : 'Start'}
+          </button>
+          <button className="button secondary" type="button" onClick={() => setShowHowItWorks(true)}>
+            How it works
+          </button>
+          <button className="button secondary alpha-button" type="button" onClick={openAlphaPlates}>
+            Ishihara only
+            <span className="alpha-tag">Alpha</span>
+          </button>
+          <button className="button secondary" type="button" onClick={() => setView('tools')}>
+            Tools
+          </button>
+        </div>
+      </section>
+    </>
   );
 }
 
