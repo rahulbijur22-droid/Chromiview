@@ -938,9 +938,9 @@ function ResultsReport({ answers, restart, deleteData }: { answers: Answers; res
 
 function ToolsView() {
   const [fg, setFg] = useState('#101426');
-  const [bg, setBg] = useState('#FFFFFF');
+  const [bg, setBg] = useState('#FFFAF2');
   const ratio = normaliseHex(fg) && normaliseHex(bg) ? contrastRatio(fg, bg) : null;
-  const [palette, setPalette] = useState('#5528D8, #1297F4, #07143F, #FFFFFF');
+  const [palette, setPalette] = useState('#D43248, #0087D1, #6F42E8, #FFFAF2');
   const colours = palette.split(',').map((item) => item.trim()).filter(Boolean);
 
   return (
