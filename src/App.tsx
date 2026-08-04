@@ -329,35 +329,37 @@ function Home({ setView, hasSaved, theme }: { setView: (view: AppView) => void; 
         </div>
       )}
 
-      <section className="hero-card view-panel">
-        <img
-          className="hero-banner"
-          src={BANNER_BY_THEME[theme]}
-          width="2508"
-          height="627"
-          alt="Chromiview: Seeing the world in full color. AI-powered colorblindness assessment."
-          decoding="async"
-        />
-        <p className="eyebrow">Colour check</p>
-        <h1>Check how you see colour.</h1>
-        <p className="lead">A quick, friendly screen check with tips at the end.</p>
-        <p className="disclaimer">{DISCLAIMER}</p>
-        <div className="actions">
-          <button className="button primary" type="button" onClick={startScreening}>
-            {hasSaved ? 'Resume' : 'Start'}
-          </button>
-          <button className="button secondary" type="button" onClick={() => setShowHowItWorks(true)}>
-            How it works
-          </button>
-          <button className="button secondary alpha-button" type="button" onClick={openAlphaPlates}>
-            Ishihara only
-            <span className="alpha-tag">Alpha</span>
-          </button>
-          <button className="button secondary" type="button" onClick={() => setView('tools')}>
-            Tools
-          </button>
-        </div>
-      </section>
+      <div className="menu-canvas view-panel">
+        <section className="hero-card menu-card">
+          <img
+            className="hero-banner"
+            src={BANNER_BY_THEME[theme]}
+            width="2508"
+            height="627"
+            alt="Chromiview: Seeing the world in full color. AI-powered colorblindness assessment."
+            decoding="async"
+          />
+          <p className="eyebrow">Colour check</p>
+          <h1>Check how you see colour.</h1>
+          <p className="lead">A quick, friendly screen check with tips at the end.</p>
+          <p className="disclaimer">{DISCLAIMER}</p>
+          <div className="actions">
+            <button className="button primary" type="button" onClick={startScreening}>
+              {hasSaved ? 'Resume' : 'Start'}
+            </button>
+            <button className="button secondary" type="button" onClick={() => setShowHowItWorks(true)}>
+              How it works
+            </button>
+            <button className="button secondary alpha-button" type="button" onClick={openAlphaPlates}>
+              Ishihara only
+              <span className="alpha-tag">Alpha</span>
+            </button>
+            <button className="button secondary" type="button" onClick={() => setView('tools')}>
+              Tools
+            </button>
+          </div>
+        </section>
+      </div>
     </>
   );
 }

@@ -8,6 +8,16 @@
   --brand-2: #0087d1;
   --brand-3: #6f42e8;
   --text-on-brand: #fffaf2;
+  --menu-bg-1: #07102a;
+  --menu-bg-2: #0e1330;
+  --menu-primary: #4a57e6;
+  --menu-primary-pressed: #3f49cc;
+  --menu-accent: #6e3bff;
+  --menu-accent-pressed: #5b2ee6;
+  --menu-highlight: #4cc2ff;
+  --menu-text: #ffffff;
+  --menu-muted: #b1b9d6;
+  --menu-surface: rgba(255, 255, 255, .04);
   --border: #dfcabc;
   --focus: #0087d1;
   --danger: #a51f1f;
@@ -199,6 +209,86 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
   max-width: 960px;
   margin-inline: auto;
 }
+.menu-canvas {
+  position: relative;
+  max-width: 960px;
+  min-height: min(72vh, 720px);
+  display: grid;
+  align-items: center;
+  padding: clamp(1rem, 3vw, 2rem);
+  border-radius: 1.2rem;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 12% 20%, rgba(76, 194, 255, .14), transparent 18%),
+    radial-gradient(circle at 88% 78%, rgba(138, 92, 255, .22), transparent 24%),
+    linear-gradient(135deg, var(--menu-primary), var(--menu-accent) 50%, rgba(74, 87, 230, .95));
+  background-size: 200% 200%;
+  animation: gradient-shift 12s ease-in-out infinite;
+  box-shadow: 0 24px 60px rgba(14, 19, 48, .24);
+}
+.menu-canvas::before {
+  content: "";
+  position: absolute;
+  inset: 8%;
+  background:
+    radial-gradient(circle at 18% 18%, rgba(76, 194, 255, .3), transparent 22%),
+    radial-gradient(circle at 82% 86%, rgba(255, 255, 255, .16), transparent 18%);
+  filter: blur(26px);
+  opacity: .7;
+  pointer-events: none;
+}
+.menu-card {
+  position: relative;
+  z-index: 1;
+  color: var(--menu-text);
+  background: linear-gradient(180deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .035));
+  border-color: rgba(255, 255, 255, .14);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(10, 12, 20, .6);
+  backdrop-filter: blur(8px);
+}
+.menu-card h1,
+.menu-card h2 {
+  color: var(--menu-text);
+}
+.menu-card .eyebrow {
+  color: var(--menu-highlight);
+}
+.menu-card .lead,
+.menu-card .muted {
+  color: var(--menu-muted);
+}
+.menu-card .disclaimer {
+  color: #e8ecff;
+  background: rgba(7, 16, 42, .58);
+  border-left-color: var(--menu-highlight);
+}
+.menu-card .button.primary {
+  background: linear-gradient(90deg, var(--menu-primary), var(--menu-accent));
+  color: var(--menu-text);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, .2);
+  box-shadow: 0 8px 24px rgba(90, 80, 230, .28);
+  transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+}
+.menu-card .button.primary:hover {
+  background: linear-gradient(90deg, var(--menu-primary-pressed), var(--menu-accent-pressed));
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 36px rgba(90, 80, 230, .34);
+}
+.menu-card .button.secondary {
+  background: rgba(255, 255, 255, .055);
+  border-color: rgba(255, 255, 255, .2);
+  color: var(--menu-text);
+}
+.menu-card .button.secondary:hover {
+  background: rgba(255, 255, 255, .1);
+  border-color: var(--menu-highlight);
+}
+.menu-card .alpha-tag {
+  border-color: rgba(255, 255, 255, .72);
+  background: var(--menu-highlight);
+  color: var(--menu-bg-1);
+}
 .hero-banner {
   display: block;
   width: 100%;
@@ -210,6 +300,28 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
   background: var(--surface-2);
   box-shadow: 0 12px 30px color-mix(in srgb, var(--brand-2) 14%, transparent);
   margin-bottom: clamp(1rem, 2.5vw, 1.5rem);
+}
+[data-theme='contrast'] .menu-canvas {
+  background: var(--bg);
+  box-shadow: none;
+  animation: none;
+}
+[data-theme='contrast'] .menu-canvas::before {
+  display: none;
+}
+[data-theme='contrast'] .menu-card {
+  color: var(--text);
+  background: var(--surface);
+  border-color: var(--border);
+  box-shadow: none;
+  backdrop-filter: none;
+}
+[data-theme='contrast'] .menu-card h1,
+[data-theme='contrast'] .menu-card h2,
+[data-theme='contrast'] .menu-card .lead,
+[data-theme='contrast'] .menu-card .muted,
+[data-theme='contrast'] .menu-card .disclaimer {
+  color: var(--text);
 }
 .loading-overlay,
 .modal-backdrop {
@@ -473,6 +585,11 @@ fieldset { border: 0; margin: 0; padding: 0; }
 @keyframes loading-slide {
   from { transform: translateX(-60%); }
   to { transform: translateX(150%); }
+}
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 @media (max-width: 760px) {
