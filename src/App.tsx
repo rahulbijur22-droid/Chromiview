@@ -610,8 +610,8 @@ function ScreeningFlow({
 
       {step === 4 && (
         <fieldset>
-          <legend ref={headingRef} tabIndex={-1}>How much friction do colours create in daily life?</legend>
-          <p className="muted">Rate each situation from 1 for no friction to 5 for significant friction.</p>
+          <legend ref={headingRef} tabIndex={-1}>Which everyday situations are made harder by colour?</legend>
+          <p className="muted">Rate each situation from 1 for no difficulty to 5 for a lot of difficulty.</p>
           <div className="scale-stack">
             {FRICTION_QS.map((question) => (
               <div className="scale-card" key={question.id}>
@@ -630,8 +630,8 @@ function ScreeningFlow({
                   ))}
                 </div>
                 <div className="scale-labels">
-                  <span>No friction</span>
-                  <span>Significant friction</span>
+                  <span>No difficulty</span>
+                  <span>A lot of difficulty</span>
                 </div>
               </div>
             ))}
